@@ -45,6 +45,9 @@ namespace Rendering.UI
                 Text("Khoostic");
                 Separator();
 
+                Button("Song 1");
+                Button("Song 2");
+
                 EndChild();
             }
 
@@ -52,9 +55,6 @@ namespace Rendering.UI
 
             if (BeginChild("##SongPanel", new Vector2(rightPanelWidth, panelHeight), ImGuiChildFlags.Borders))
             {
-                Button("Song 1");
-                Button("Song 2");
-
                 EndChild();
             }
 
