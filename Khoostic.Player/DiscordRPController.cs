@@ -1,3 +1,5 @@
+using BiggyTools.Debugging;
+
 using DiscordRPC;
 
 namespace Khoostic.Player
@@ -20,7 +22,7 @@ namespace Khoostic.Player
                 State = $"By {artist}",
                 Assets = new Assets()
                 {
-                    LargeImageKey = "logo",
+                    LargeImageKey = "logooo",
                     LargeImageText = "Khoostic"
                 },
 

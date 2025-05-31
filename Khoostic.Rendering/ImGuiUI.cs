@@ -160,7 +160,7 @@ namespace Rendering.UI
                 SameLine();
                 SetCursorPosX(startX + timeSize.X + textSpacing);
                 SetNextItemWidth(playbackSliderWidth);
-        
+
                 if (SliderFloat("##PlaybackSlider", ref playbackPosition, 0.0f, totalSongLength, ""))
                 {
                     KhoosticPlayer.MediaPlayer.Time = (long)(playbackPosition * 1000);
