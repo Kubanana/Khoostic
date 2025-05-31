@@ -90,35 +90,37 @@ namespace Rendering.UI
                     var songTitle = songFile.Tag.Title ?? Path.GetFileNameWithoutExtension(KhoosticPlayer.CurrentSong);
                     var artist = songFile.Tag.FirstPerformer ?? "Unknown Artist";
 
-                    var region = GetContentRegionAvail();
+                    float contentWidth = GetContentRegionAvail().X;
+                    float contentHeight = GetContentRegionAvail().Y;
+
                     float imageSize = 512f;
-                    float spacing = 10f;
+                    float textSpacing = 10f;
 
-                    float totalHeight = imageSize + spacing * 2 + CalcTextSize(songTitle).Y + CalcTextSize(artist).Y;
+                    var songTitleSize = CalcTextSize(songTitle);
+                    var artistSize = CalcTextSize(artist);
+                    float totalContentSize = imageSize + textSpacing;
 
-                    float startY = (region.Y - totalHeight) * 0.5f;
+                    float startY = (contentHeight - totalContentSize) * 0.5f;
+
                     SetCursorPosY(startY);
-
-                    float centerX = GetContentRegionAvail().X * 0.5f;
 
                     if (songFile.Tag.Pictures.Length > 0)
                     {
                         var picData = songFile.Tag.Pictures[0].Data.Data;
                         var textureId = TextureCache.GetOrCreateTexture(picData);
 
-                        SetCursorPosX(centerX - imageSize * 0.5f);
+                        SetCursorPosX((contentWidth - imageSize) * 0.5f);
                         Image((IntPtr)textureId, new Vector2(imageSize, imageSize));
-
-                        Dummy(new Vector2(0, spacing));
                     }
+
+                    Dummy(new Vector2(0, textSpacing));
 
                     var nowPlaying = $"Now Playing: {songTitle}";
                     var nowPlayingSize = CalcTextSize(nowPlaying);
-                    SetCursorPosX(centerX - nowPlayingSize.X * 0.5f);
+                    SetCursorPosX((contentWidth - songTitleSize.X) * 0.5f);
                     Text(nowPlaying);
 
-                    var artistSize = CalcTextSize(artist);
-                    SetCursorPosX(centerX - artistSize.X * 0.5f);
+                    SetCursorPosX((contentWidth - artistSize.X) * 0.5f);
                     Text(artist);
                 }
 
