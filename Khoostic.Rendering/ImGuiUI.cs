@@ -4,6 +4,7 @@ using BiggyTools.Debugging;
 using ImGuiNET;
 
 using Khoostic.Player;
+using Khoostic.Rendering;
 
 using LibVLCSharp.Shared;
 
@@ -21,7 +22,7 @@ namespace Rendering.UI
         private static string[] _musicFiles;
 
         private static float _leftPanelWidth = 250f;
-        private static float _buttomBarHeight = 80f;
+        private static float _bottomBarHeight = 80f;
 
         public static void OnStart()
         {
@@ -73,13 +74,59 @@ namespace Rendering.UI
                 EndChild();
             }
 
-            if (BeginChild("##MiddlePanel"))
+            SameLine();
+
+            SetCursorPosX(0);
+            SetCursorPosX(_leftPanelWidth);
+
+            float middlePanelWidth = viewportSize.X - _leftPanelWidth;
+            float middlePanelHeight = viewportSize.Y - _bottomBarHeight;
+
+            if (BeginChild("##MiddlePanel", new Vector2(middlePanelWidth, middlePanelHeight), ImGuiChildFlags.Borders))
             {
+                if (!string.IsNullOrEmpty(KhoosticPlayer.CurrentSong))
+                {
+                    var songFile = TagLib.File.Create(KhoosticPlayer.CurrentSong);
+                    var songTitle = songFile.Tag.Title ?? Path.GetFileNameWithoutExtension(KhoosticPlayer.CurrentSong);
+                    var artist = songFile.Tag.FirstPerformer ?? "Unknown Artist";
+
+                    var region = GetContentRegionAvail();
+                    float imageSize = 256f;
+                    float spacing = 10f;
+
+                    float totalHeight = imageSize + spacing * 2 + CalcTextSize(songTitle).Y + CalcTextSize(artist).Y;
+
+                    float startY = (region.Y - totalHeight) * 0.5f;
+                    SetCursorPosY(startY);
+
+                    float centerX = GetContentRegionAvail().X * 0.5f;
+
+                    if (songFile.Tag.Pictures.Length > 0)
+                    {
+                        var picData = songFile.Tag.Pictures[0].Data.Data;
+                        var textureId = TextureCache.GetOrCreateTexture(picData);
+
+                        SetCursorPosX(centerX - imageSize * 0.5f);
+                        Image((IntPtr)textureId, new Vector2(imageSize, imageSize));
+
+                        Dummy(new Vector2(0, spacing));
+                    }
+
+                    var nowPlaying = $"Now Playing: {songTitle}";
+                    var nowPlayingSize = CalcTextSize(nowPlaying);
+                    SetCursorPosX(centerX - nowPlayingSize.X * 0.5f);
+                    Text(nowPlaying);
+
+                    var artistSize = CalcTextSize(artist);
+                    SetCursorPosX(centerX - artistSize.X * 0.5f);
+                    Text(artist);
+                }
+
                 EndChild();
             }
 
-            SetCursorPosY(viewportSize.Y - _buttomBarHeight);
-            if (BeginChild("##ControlPanel", new Vector2(rightPanelWidth, _buttomBarHeight), ImGuiChildFlags.Borders))
+            SetCursorPosY(viewportSize.Y - _bottomBarHeight);
+            if (BeginChild("##ControlPanel", new Vector2(rightPanelWidth, _bottomBarHeight), ImGuiChildFlags.Borders))
             {
 
                 float regionWidth = GetContentRegionAvail().X;
@@ -127,7 +174,7 @@ namespace Rendering.UI
         {
             foreach (var song in _musicFiles)
             {
-                if (Button(Path.GetFileName(song)))
+                if (Button(Path.GetFileName(Path.GetFileNameWithoutExtension(song))))
                 {
                     KhoosticPlayer.Play(song);
                     KhoosticPlayer.CurrentSong = song;
