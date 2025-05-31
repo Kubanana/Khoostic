@@ -6,8 +6,6 @@ using ImGuiNET;
 using Khoostic.Player;
 using Khoostic.Rendering;
 
-using LibVLCSharp.Shared;
-
 using Newtonsoft.Json.Linq;
 using static ImGuiNET.ImGui;
 
@@ -32,6 +30,7 @@ namespace Rendering.UI
             .ToArray();
 
             KhoosticPlayer.InitPlayer();
+            DiscordRPController.Init();
 
             Logger.Log(_musicDir);
         }
@@ -191,6 +190,12 @@ namespace Rendering.UI
                 {
                     KhoosticPlayer.Play(song);
                     KhoosticPlayer.CurrentSong = song;
+
+                    var songFile = TagLib.File.Create(KhoosticPlayer.CurrentSong);
+                    var songTitle = songFile.Tag.Title ?? Path.GetFileNameWithoutExtension(KhoosticPlayer.CurrentSong);
+                    var artist = songFile.Tag.FirstPerformer ?? "Unknown Artist";
+
+                    DiscordRPController.UpdateSongPresence(songTitle, artist);
                 }
             }
         }
