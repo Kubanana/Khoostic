@@ -1,8 +1,6 @@
-using System.Drawing;
 using BiggyTools.Debugging;
 using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -15,9 +13,9 @@ namespace Rendering.UI
 
         public KhoosticWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
         {
-            _imGuiController = new ImGuiController(ClientSize.X, ClientSize.Y);
-
             GL.LoadBindings(new GLFWBindingsContext());
+
+            _imGuiController = new ImGuiController(ClientSize.X, ClientSize.Y);
         }
 
         protected override void OnLoad()

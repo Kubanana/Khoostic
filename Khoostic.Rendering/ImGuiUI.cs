@@ -5,6 +5,8 @@ using ImGuiNET;
 
 using Khoostic.Player;
 
+using LibVLCSharp.Shared;
+
 using Newtonsoft.Json.Linq;
 using static ImGuiNET.ImGui;
 
@@ -17,6 +19,9 @@ namespace Rendering.UI
 
         private static string _musicDir;
         private static string[] _musicFiles;
+
+        private static float _leftPanelWidth = 250f;
+        private static float _buttomBarHeight = 80f;
 
         public static void OnStart()
         {
@@ -68,10 +73,50 @@ namespace Rendering.UI
                 EndChild();
             }
 
-            SameLine();
-
-            if (BeginChild("##SongPanel", new Vector2(rightPanelWidth, panelHeight), ImGuiChildFlags.Borders))
+            if (BeginChild("##MiddlePanel"))
             {
+                EndChild();
+            }
+
+            SetCursorPosY(viewportSize.Y - _buttomBarHeight);
+            if (BeginChild("##ControlPanel", new Vector2(rightPanelWidth, _buttomBarHeight), ImGuiChildFlags.Borders))
+            {
+
+                float regionWidth = GetContentRegionAvail().X;
+                float buttonWidth = 60f;
+                float sliderWidth = 600f;
+                float spacing = 2f;
+
+                SetCursorPosX((regionWidth - buttonWidth) * 0.5f);
+                if (Button(KhoosticPlayer.MediaPlayer.IsPlaying ? "Pause" : "Play", new Vector2(buttonWidth, 40)))
+                {
+                    KhoosticPlayer.TogglePause();
+                }
+
+                Dummy(new Vector2(0, spacing));
+
+                float playbackPosition = KhoosticPlayer.MediaPlayer.Time / 1000f;
+                float totalSongLength = KhoosticPlayer.MediaPlayer.Length / 1000f;
+
+                float textSpacing = 10f;
+                string timeLabel = $"{KhoosticPlayer.FormatTime(playbackPosition)} / {KhoosticPlayer.FormatTime(totalSongLength)}";
+                Vector2 timeSize = CalcTextSize(timeLabel);
+
+                float totalWidth = timeSize.X + textSpacing + sliderWidth;
+                float startX = (regionWidth - totalWidth) * 0.5f;
+
+                SetCursorPosX(startX);
+                Text(timeLabel);
+
+                SameLine();
+                SetCursorPosX(startX + timeSize.X + textSpacing);
+                SetNextItemWidth(sliderWidth);
+        
+                if (SliderFloat("##PlaybackSlider", ref playbackPosition, 0.0f, totalSongLength, ""))
+                {
+                    KhoosticPlayer.MediaPlayer.Time = (long)(playbackPosition * 1000);
+                }
+
                 EndChild();
             }
 
@@ -85,21 +130,8 @@ namespace Rendering.UI
                 if (Button(Path.GetFileName(song)))
                 {
                     KhoosticPlayer.Play(song);
+                    KhoosticPlayer.CurrentSong = song;
                 }
-            }
-
-            Separator();
-
-            if (Button("Pause"))
-            {
-                KhoosticPlayer.Pause();
-            }
-
-            SameLine();
-
-            if (Button("Stop"))
-            {
-                KhoosticPlayer.Stop();
             }
         }
 
