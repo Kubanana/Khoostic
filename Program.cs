@@ -1,4 +1,6 @@
-﻿using OpenTK.Mathematics;
+﻿using Khoostic.Player;
+
+using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
 
 using Rendering.UI;

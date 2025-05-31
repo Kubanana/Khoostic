@@ -15,9 +15,9 @@ namespace Rendering.UI
 
         public KhoosticWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
         {
-            GL.LoadBindings(new GLFWBindingsContext());
-
             _imGuiController = new ImGuiController(ClientSize.X, ClientSize.Y);
+
+            GL.LoadBindings(new GLFWBindingsContext());
         }
 
         protected override void OnLoad()
@@ -26,6 +26,8 @@ namespace Rendering.UI
 
             ImGui.CreateContext();
             ImGui.SetCurrentContext(ImGui.GetCurrentContext());
+
+            ImGuiUI.OnStart();
 
             GL.ClearColor(0f, 0f, 0f, 1f);
         }

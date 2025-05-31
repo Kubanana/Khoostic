@@ -1,8 +1,10 @@
-using System.Drawing;
 using System.Globalization;
 using System.Numerics;
 using BiggyTools.Debugging;
 using ImGuiNET;
+
+using Khoostic.Player;
+
 using Newtonsoft.Json.Linq;
 using static ImGuiNET.ImGui;
 
@@ -11,6 +13,22 @@ namespace Rendering.UI
     public static class ImGuiUI
     {
         public static Vector4 BackgroundClearColor = new Vector4(0f, 0f, 0f, 1f);
+        public static ImFontPtr DefaultFont;
+
+        private static string _musicDir;
+        private static string[] _musicFiles;
+
+        public static void OnStart()
+        {
+            _musicDir = Path.Combine(Environment.GetEnvironmentVariable("HOME"), "Music");
+            _musicFiles = Directory.GetFiles(_musicDir, "*.*", SearchOption.AllDirectories)
+            .Where(f => f.EndsWith(".mp3") || f.EndsWith(".ogg") || f.EndsWith(".flac") || f.EndsWith(".wav"))
+            .ToArray();
+
+            KhoosticPlayer.InitPlayer();
+
+            Logger.Log(_musicDir);
+        }
 
         public static void Render()
         {
@@ -40,13 +58,12 @@ namespace Rendering.UI
             float rightPanelWidth = GetContentRegionAvail().X;
             float panelHeight = GetContentRegionAvail().Y;
 
-            if (BeginChild("##ToolListPanel", new Vector2(leftPanelWidth, panelHeight)))
+            if (BeginChild("##SongListPanel", new Vector2(leftPanelWidth, panelHeight)))
             {
-                Text("Khoostic");
+                Text("Music Library");
                 Separator();
 
-                Button("Song 1");
-                Button("Song 2");
+                InitializeSongs();
 
                 EndChild();
             }
@@ -59,6 +76,31 @@ namespace Rendering.UI
             }
 
             End();
+        }
+
+        private static void InitializeSongs()
+        {
+            foreach (var song in _musicFiles)
+            {
+                if (Button(Path.GetFileName(song)))
+                {
+                    KhoosticPlayer.Play(song);
+                }
+            }
+
+            Separator();
+
+            if (Button("Pause"))
+            {
+                KhoosticPlayer.Pause();
+            }
+
+            SameLine();
+
+            if (Button("Stop"))
+            {
+                KhoosticPlayer.Stop();
+            }
         }
 
         public static Dictionary<string, Vector4> LoadJsonColors(string path)
