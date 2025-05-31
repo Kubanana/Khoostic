@@ -91,7 +91,7 @@ namespace Rendering.UI
                     var artist = songFile.Tag.FirstPerformer ?? "Unknown Artist";
 
                     var region = GetContentRegionAvail();
-                    float imageSize = 256f;
+                    float imageSize = 512f;
                     float spacing = 10f;
 
                     float totalHeight = imageSize + spacing * 2 + CalcTextSize(songTitle).Y + CalcTextSize(artist).Y;
@@ -131,7 +131,8 @@ namespace Rendering.UI
 
                 float regionWidth = GetContentRegionAvail().X;
                 float buttonWidth = 60f;
-                float sliderWidth = 600f;
+                float playbackSliderWidth = 600f;
+                float volumeSliderWidth = 100f;
                 float spacing = 2f;
 
                 SetCursorPosX((regionWidth - buttonWidth) * 0.5f);
@@ -149,7 +150,7 @@ namespace Rendering.UI
                 string timeLabel = $"{KhoosticPlayer.FormatTime(playbackPosition)} / {KhoosticPlayer.FormatTime(totalSongLength)}";
                 Vector2 timeSize = CalcTextSize(timeLabel);
 
-                float totalWidth = timeSize.X + textSpacing + sliderWidth;
+                float totalWidth = timeSize.X + textSpacing + playbackSliderWidth;
                 float startX = (regionWidth - totalWidth) * 0.5f;
 
                 SetCursorPosX(startX);
@@ -157,11 +158,21 @@ namespace Rendering.UI
 
                 SameLine();
                 SetCursorPosX(startX + timeSize.X + textSpacing);
-                SetNextItemWidth(sliderWidth);
+                SetNextItemWidth(playbackSliderWidth);
         
                 if (SliderFloat("##PlaybackSlider", ref playbackPosition, 0.0f, totalSongLength, ""))
                 {
                     KhoosticPlayer.MediaPlayer.Time = (long)(playbackPosition * 1000);
+                }
+
+                SameLine(0, 20);
+
+                int volume = KhoosticPlayer.MediaPlayer.Volume;
+
+                SetNextItemWidth(volumeSliderWidth);
+                if (SliderInt("##Volume", ref volume, 0, 125))
+                {
+                    KhoosticPlayer.MediaPlayer.Volume = (int)volume;
                 }
 
                 EndChild();
