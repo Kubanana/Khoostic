@@ -14,7 +14,6 @@ namespace Rendering.UI
     public static class ImGuiUI
     {
         public static Vector4 BackgroundClearColor = new Vector4(0f, 0f, 0f, 1f);
-        public static ImFontPtr DefaultFont;
 
         private static string _musicDir;
         private static string[] _musicFiles;

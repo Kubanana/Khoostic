@@ -6,7 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
-    <PublishAot>true</PublishAot>
+  <SelfContained>true</SelfContained>
+  <PublishSingleFile>true</PublishSingleFile>
+
   </PropertyGroup>
 
    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
