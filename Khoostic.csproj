@@ -9,6 +9,8 @@
   <SelfContained>true</SelfContained>
   <PublishSingleFile>true</PublishSingleFile>
 
+  <ApplicationIcon>Assets/Logo.ico</ApplicationIcon>
+
   </PropertyGroup>
 
    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

@@ -1,9 +1,14 @@
+using System.Runtime.CompilerServices;
+
 using BiggyTools.Debugging;
 using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
+using OpenTK.Windowing.Common.Input;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Rendering.UI
 {
@@ -14,6 +19,7 @@ namespace Rendering.UI
         public KhoosticWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
         {
             GL.LoadBindings(new GLFWBindingsContext());
+            SetWindowIcon("Assets/Logo.png");
 
             _imGuiController = new ImGuiController(ClientSize.X, ClientSize.Y);
         }
@@ -70,6 +76,21 @@ namespace Rendering.UI
             base.Close();
 
             Logger.Log("UIWindow::Closed Window");
+        }
+
+        private void SetWindowIcon(string imagePath)
+        {
+            using (SixLabors.ImageSharp.Image<Rgba32> image = (SixLabors.ImageSharp.Image<Rgba32>)SixLabors.ImageSharp.Image.Load(imagePath))
+            {
+                byte[] pixels = new byte[image.Width * image.Height * Unsafe.SizeOf<Rgba32>()];
+
+                var windowIcon = new WindowIcon(new[]
+                {
+                    new OpenTK.Windowing.Common.Input.Image(image.Width, image.Height, pixels)
+                });
+
+                Icon = windowIcon;
+            }
         }
     }
 }
