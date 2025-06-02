@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Numerics;
 using BiggyTools.Debugging;
@@ -22,11 +23,28 @@ namespace Rendering.UI
         private static float _leftPanelWidth = 250f;
         private static float _bottomBarHeight = 100f;
 
+        private static ConcurrentQueue<Action> _uiThreadActions = new ConcurrentQueue<Action>();
+        private static int _uiThreadId;
+
         public static void OnStart()
         {
             _musicDir = Path.Combine(Environment.GetEnvironmentVariable("HOME"), "Music");
+            _uiThreadId = Thread.CurrentThread.ManagedThreadId;
+
 
             KhoosticPlayer.InitPlayer();
+
+            if (KhoosticPlayer.MediaPlayer != null)
+            {
+                KhoosticPlayer.MediaPlayer.EndReached += (sender, e) =>
+                {
+                    _uiThreadActions.Enqueue(() =>
+                    {
+                        KhoosticPlayer.PlayNextSong();
+                    });
+                };
+            }
+
             LoadAllMusicFiles(_musicDir);
             DiscordRPController.Init();
 
@@ -35,6 +53,11 @@ namespace Rendering.UI
 
         public static void Render()
         {
+            while (_uiThreadActions.TryDequeue(out var action))
+            {
+                action.Invoke();
+            }
+
             if (File.Exists("colors.json"))
             {
                 var colors = LoadJsonColors("colors.json");

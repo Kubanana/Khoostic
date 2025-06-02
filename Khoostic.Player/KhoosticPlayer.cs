@@ -1,3 +1,5 @@
+using BiggyTools.Debugging;
+
 using LibVLCSharp.Shared;
 
 namespace Khoostic.Player
@@ -26,14 +28,6 @@ namespace Khoostic.Player
             Core.Initialize();
             _libVLC = new LibVLC();
             MediaPlayer = new MediaPlayer(_libVLC);
-
-            if (MediaPlayer != null)
-            {
-                MediaPlayer.EndReached += (sender, e) =>
-                {
-                    PlayNextSong();
-                };
-            }
         }
 
         public static void SetPlayList(List<string> songs, string initialSongPath = null)
