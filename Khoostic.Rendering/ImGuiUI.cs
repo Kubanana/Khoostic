@@ -16,19 +16,18 @@ namespace Rendering.UI
         public static Vector4 BackgroundClearColor = new Vector4(0f, 0f, 0f, 1f);
 
         private static string _musicDir;
-        private static string[] _musicFiles;
+        private static List<string> _musicFiles;
+        private static string _songSearchFilter = string.Empty;
 
         private static float _leftPanelWidth = 250f;
-        private static float _bottomBarHeight = 80f;
+        private static float _bottomBarHeight = 100f;
 
         public static void OnStart()
         {
             _musicDir = Path.Combine(Environment.GetEnvironmentVariable("HOME"), "Music");
-            _musicFiles = Directory.GetFiles(_musicDir, "*.*", SearchOption.AllDirectories)
-            .Where(f => f.EndsWith(".mp3") || f.EndsWith(".ogg") || f.EndsWith(".flac") || f.EndsWith(".wav"))
-            .ToArray();
 
             KhoosticPlayer.InitPlayer();
+            LoadAllMusicFiles(_musicDir);
             DiscordRPController.Init();
 
             Logger.Log(_musicDir);
@@ -66,19 +65,26 @@ namespace Rendering.UI
             {
                 Text("Music Library");
                 Separator();
+                Spacing();
 
-                InitializeSongs();
+                InputTextWithHint("##Search", "Search songs...", ref _songSearchFilter, 256);
+                Spacing();
+
+                if (BeginChild("##SongList", new Vector2(-1, -1), ImGuiChildFlags.None))
+                {
+                    InitializeSongs();
+                    EndChild();
+                }
 
                 EndChild();
             }
 
             SameLine();
 
-            SetCursorPosX(0);
-            SetCursorPosX(_leftPanelWidth);
-
             float middlePanelWidth = viewportSize.X - _leftPanelWidth;
             float middlePanelHeight = viewportSize.Y - _bottomBarHeight;
+
+            SetCursorPosX(_leftPanelWidth);
 
             if (BeginChild("##MiddlePanel", new Vector2(middlePanelWidth, middlePanelHeight), ImGuiChildFlags.Borders))
             {
@@ -94,11 +100,11 @@ namespace Rendering.UI
                     float imageSize = 512f;
                     float textSpacing = 10f;
 
-                    var songTitleSize = CalcTextSize(songTitle);
-                    var artistSize = CalcTextSize(artist);
-                    float totalContentSize = imageSize + textSpacing;
+                    float estimatedTextHeight = CalcTextSize(songTitle).Y + CalcTextSize(artist).Y + textSpacing;
+                    float totalContentHeight = imageSize + textSpacing + estimatedTextHeight;
 
-                    float startY = (contentHeight - totalContentSize) * 0.5f;
+                    float startY = (contentHeight - totalContentHeight) * 0.5f;
+                    if (startY < 0) startY = 0;
 
                     SetCursorPosY(startY);
 
@@ -111,15 +117,34 @@ namespace Rendering.UI
                         Image((IntPtr)textureId, new Vector2(imageSize, imageSize));
                     }
 
+                    else
+                    {
+                        SetCursorPosX((contentWidth - imageSize) * 0.5f);
+                        Dummy(new Vector2(imageSize, imageSize));
+                        SetCursorPosX((contentWidth - CalcTextSize("No Album Art").X) * 0.5f);
+                        Text("No Album Art");
+                    }
+
                     Dummy(new Vector2(0, textSpacing));
 
                     var nowPlaying = $"Now Playing: {songTitle}";
                     var nowPlayingSize = CalcTextSize(nowPlaying);
-                    SetCursorPosX((contentWidth - songTitleSize.X) * 0.5f);
+                    SetCursorPosX((contentWidth - nowPlayingSize.X) * 0.5f);
                     Text(nowPlaying);
 
+                    var artistSize = CalcTextSize(artist);
                     SetCursorPosX((contentWidth - artistSize.X) * 0.5f);
                     Text(artist);
+                }
+
+                else
+                {
+                    string message = "No song playing...";
+
+                    float messageWidth = CalcTextSize(message).X;
+                    float messageHeight = CalcTextSize(message).Y;
+                    SetCursorPos(new Vector2((GetContentRegionAvail().X - messageWidth) * 0.5f, (GetContentRegionAvail().Y - messageHeight) * 0.5f));
+                    Text(message);
                 }
 
                 EndChild();
@@ -130,50 +155,92 @@ namespace Rendering.UI
             {
 
                 float regionWidth = GetContentRegionAvail().X;
-                float buttonWidth = 60f;
-                float playbackSliderWidth = 600f;
-                float volumeSliderWidth = 100f;
-                float spacing = 2f;
+                float largeButtonWidth = 80f;
+                float iconButtonSize = 32f;
+                float playbackSliderWidth = regionWidth * 0.4f;
+                float volumeSliderWidth = 120f;
+                float spacing = 10f;
 
-                SetCursorPosX((regionWidth - buttonWidth) * 0.5f);
-                if (Button(KhoosticPlayer.MediaPlayer.IsPlaying ? "Pause" : "Play", new Vector2(buttonWidth, 40)))
+                float totalControlsPanelWidth = largeButtonWidth + CalcTextSize("00:00 / 00:00").X + playbackSliderWidth + volumeSliderWidth + (iconButtonSize * 4) + (spacing * 10);
+
+                SetCursorPosX((regionWidth - totalControlsPanelWidth) * 0.5f);
+
+                if (Button("<<", new Vector2(iconButtonSize, 40)))
+                {
+                    KhoosticPlayer.PlayPreviousSong();
+                }
+
+                SameLine(0, spacing);
+
+                if (Button(KhoosticPlayer.MediaPlayer.IsPlaying ? "Pause" : "Play", new Vector2(largeButtonWidth, 40)))
                 {
                     KhoosticPlayer.TogglePause();
                 }
 
-                Dummy(new Vector2(0, spacing));
+                SameLine(0, spacing);
+
+                if (Button(">>", new Vector2(iconButtonSize, 40)))
+                {
+                    KhoosticPlayer.PlayNextSong();
+                }
+
+                SameLine(0, spacing * 2);
 
                 float playbackPosition = KhoosticPlayer.MediaPlayer.Time / 1000f;
                 float totalSongLength = KhoosticPlayer.MediaPlayer.Length / 1000f;
-
-                float textSpacing = 10f;
                 string timeLabel = $"{KhoosticPlayer.FormatTime(playbackPosition)} / {KhoosticPlayer.FormatTime(totalSongLength)}";
-                Vector2 timeSize = CalcTextSize(timeLabel);
-
-                float totalWidth = timeSize.X + textSpacing + playbackSliderWidth;
-                float startX = (regionWidth - totalWidth) * 0.5f;
-
-                SetCursorPosX(startX);
                 Text(timeLabel);
+                SameLine(0, spacing);
 
-                SameLine();
-                SetCursorPosX(startX + timeSize.X + textSpacing);
                 SetNextItemWidth(playbackSliderWidth);
-
                 if (SliderFloat("##PlaybackSlider", ref playbackPosition, 0.0f, totalSongLength, ""))
                 {
                     KhoosticPlayer.MediaPlayer.Time = (long)(playbackPosition * 1000);
                 }
 
-                SameLine(0, 20);
+                SameLine(0, spacing * 2);
 
                 int volume = KhoosticPlayer.MediaPlayer.Volume;
-
                 SetNextItemWidth(volumeSliderWidth);
                 if (SliderInt("##Volume", ref volume, 0, 125))
                 {
                     KhoosticPlayer.MediaPlayer.Volume = (int)volume;
                 }
+
+                SameLine(0, spacing);
+
+                bool isShuffle = KhoosticPlayer.IsShuffleEnabled;
+                if (isShuffle) PushStyleColor(ImGuiCol.Button, new Vector4(0.2f, 0.5f, 0.8f, 1.0f));
+                if (Button("Shuffle", new Vector2(iconButtonSize, 40)))
+                {
+                    KhoosticPlayer.ToggleShuffle();
+                }
+
+                if (isShuffle) PopStyleColor();
+                SameLine(0, spacing);
+
+                string repeatText = "";
+                Vector4 repeatColor = new Vector4(0.3f, 0.3f, 0.3f, 1.0f);
+                switch (KhoosticPlayer.GetRepeatMode)
+                {
+                    case KhoosticPlayer.RepeatMode.None:
+                        repeatText = "Repeat Off";
+                        break;
+                    case KhoosticPlayer.RepeatMode.One:
+                        repeatText = "Repeat 1"; repeatColor = new Vector4(0.2f, 0.5f, 0.8f, 1.0f);
+                        break;
+                    case KhoosticPlayer.RepeatMode.All:
+                        repeatText = "Repeat All"; repeatColor = new Vector4(0.2f, 0.5f, 0.8f, 1.0f);
+                        break;
+                }
+
+                PushStyleColor(ImGuiCol.Button, repeatColor);
+                if (Button(repeatText, new Vector2(iconButtonSize * 1.5f, 40)))
+                {
+                    KhoosticPlayer.CycleRepeatMode();
+                }
+
+                PopStyleColor();
 
                 EndChild();
             }
@@ -183,18 +250,39 @@ namespace Rendering.UI
 
         private static void InitializeSongs()
         {
-            foreach (var song in _musicFiles)
-            {
-                if (Button(Path.GetFileName(Path.GetFileNameWithoutExtension(song))))
-                {
-                    KhoosticPlayer.Play(song);
-                    KhoosticPlayer.CurrentSong = song;
+            var filteredSongs = string.IsNullOrEmpty(_songSearchFilter)
+                ? _musicFiles
+                : _musicFiles.Where(s => Path.GetFileNameWithoutExtension(s).ToLower().Contains(_songSearchFilter.ToLower())).ToList();
 
-                    var songFile = TagLib.File.Create(KhoosticPlayer.CurrentSong);
+            KhoosticPlayer.SetPlayList(filteredSongs);
+
+            for (int i = 0; i < filteredSongs.Count; i++)
+            {
+                string song = filteredSongs[i];
+                bool isCurrentSong = song == KhoosticPlayer.CurrentSong;
+
+                if (isCurrentSong)
+                {
+                    PushStyleColor(ImGuiCol.Text, new Vector4(0.2f, 0.7f, 0.9f, 1.0f));
+                    PushStyleColor(ImGuiCol.Button, new Vector4(0.1f, 0.3f, 0.4f, 1.0f));
+                    PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(0.2f, 0.4f, 0.5f, 1.0f));
+                    PushStyleColor(ImGuiCol.ButtonActive, new Vector4(0.15f, 0.35f, 0.45f, 1.0f));
+                }
+
+                if (Button(Path.GetFileNameWithoutExtension(song)))
+                {
+                    KhoosticPlayer.PlayByIndex(i);
+
+                    var songFile = TagLib.File.Create(song);
                     var songTitle = songFile.Tag.Title ?? Path.GetFileNameWithoutExtension(KhoosticPlayer.CurrentSong);
                     var artist = songFile.Tag.FirstPerformer ?? "Unknown Artist";
 
                     DiscordRPController.UpdateSongPresence(songTitle, artist);
+                }
+
+                if (isCurrentSong)
+                {
+                    PopStyleColor(4);
                 }
             }
         }
@@ -242,6 +330,22 @@ namespace Rendering.UI
             }
 
             return colorDict;
+        }
+
+        private static void LoadAllMusicFiles(string musicFolderPath)
+        {
+            if (Directory.Exists(musicFolderPath))
+            {
+                _musicFiles = Directory.GetFiles(musicFolderPath, "*.mp3", SearchOption.AllDirectories)
+                                    .Concat(Directory.GetFiles(musicFolderPath, "*.flac", SearchOption.AllDirectories))
+                                    .Concat(Directory.GetFiles(musicFolderPath, "*.wav", SearchOption.AllDirectories))
+                                    .ToList();
+            }
+
+            else
+            {
+                Logger.Log($"Music folder not found: {musicFolderPath}");
+            }
         }
 
         private static Vector4 HexToVec4(string hex)
