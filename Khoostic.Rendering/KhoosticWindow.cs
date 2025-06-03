@@ -20,6 +20,7 @@ namespace Rendering.UI
         {
             GL.LoadBindings(new GLFWBindingsContext());
             SetWindowIcon("Assets/Logo.png");
+            UpdateFrequency = 60;
 
             _imGuiController = new ImGuiController(ClientSize.X, ClientSize.Y);
         }
