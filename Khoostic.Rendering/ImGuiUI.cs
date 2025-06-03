@@ -295,12 +295,6 @@ namespace Rendering.UI
                 if (Button(Path.GetFileNameWithoutExtension(song)))
                 {
                     KhoosticPlayer.PlayByIndex(i);
-
-                    var songFile = TagLib.File.Create(song);
-                    var songTitle = songFile.Tag.Title ?? Path.GetFileNameWithoutExtension(KhoosticPlayer.CurrentSong);
-                    var artist = songFile.Tag.FirstPerformer ?? "Unknown Artist";
-
-                    DiscordRPController.UpdateSongPresence(songTitle, artist);
                 }
 
                 if (isCurrentSong)

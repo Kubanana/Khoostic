@@ -54,6 +54,12 @@ namespace Khoostic.Player
         {
             var media = new Media(_libVLC, path, FromType.FromPath);
             MediaPlayer?.Play(media);
+
+            var songFile = TagLib.File.Create(path);
+            var songTitle = songFile.Tag.Title ?? Path.GetFileNameWithoutExtension(path);
+            var artist = songFile.Tag.FirstPerformer ?? "Unknown Artist";
+
+            DiscordRPController.UpdateSongPresence(songTitle, artist);
         }
 
         public static void PlayByIndex(int index)
