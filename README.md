@@ -1,4 +1,4 @@
-<img align="left" style="width: 256px" src="Assets/Logo.png">
+![Logo](Assets/Logo.png)
 
 # Khoostic :musical_note: 
 
