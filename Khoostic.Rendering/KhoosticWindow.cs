@@ -78,6 +78,16 @@ namespace Rendering.UI
             Logger.Log("UIWindow::Closed Window");
         }
 
+        protected override void OnTextInput(TextInputEventArgs e)
+        {
+            base.OnTextInput(e);
+
+            if (e.Unicode != 0)
+            {
+                _imGuiController.AddInputCharacter((char)e.Unicode);
+            }
+        }
+
         private void SetWindowIcon(string imagePath)
         {
             using (SixLabors.ImageSharp.Image<Rgba32> image = (SixLabors.ImageSharp.Image<Rgba32>)SixLabors.ImageSharp.Image.Load(imagePath))
