@@ -55,6 +55,8 @@ namespace Khoostic.Player
             var media = new Media(_libVLC, path, FromType.FromPath);
             MediaPlayer?.Play(media);
 
+            CurrentSong = path;
+
             var songFile = TagLib.File.Create(path);
             var songTitle = songFile.Tag.Title ?? Path.GetFileNameWithoutExtension(path);
             var artist = songFile.Tag.FirstPerformer ?? "Unknown Artist";
