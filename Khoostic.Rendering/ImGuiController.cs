@@ -6,8 +6,9 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Diagnostics;
 using ErrorCode = OpenTK.Graphics.OpenGL4.ErrorCode;
+using BiggyTools.Debugging;
 
-    public class ImGuiController : IDisposable
+public class ImGuiController : IDisposable
     {
         private bool _frameBegun;
 
@@ -55,7 +56,28 @@ using ErrorCode = OpenTK.Graphics.OpenGL4.ErrorCode;
             IntPtr context = ImGui.CreateContext();
             ImGui.SetCurrentContext(context);
             var io = ImGui.GetIO();
-            io.Fonts.AddFontDefault();
+
+            string fontFileName = "Comfortaa-Regular.ttf";
+            string fontDirectory = Path.Combine(AppContext.BaseDirectory, "Fonts");
+            string fontPath = Path.Combine(fontDirectory, fontFileName);
+
+
+            float fontSize = 16.0f;
+
+            if (File.Exists(fontPath))
+            {
+                io.Fonts.AddFontFromFileTTF(fontPath, fontSize);
+            }
+
+            else
+            {
+                io.Fonts.AddFontDefault();            
+            }
+
+            io.Fonts.Build();
+
+            RecreateFontDeviceTexture();
+
 
             io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;
             // Enable Docking
