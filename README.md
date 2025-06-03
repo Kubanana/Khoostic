@@ -1,4 +1,5 @@
 <img align="left" style="width: 256px" src="Assets/Logo.png">
+
 # Khoostic :musical_note: 
 
 Khoostic is a **GPU-Accelerated, Corss-Platform** Music Player writen in **Pure** C#.
