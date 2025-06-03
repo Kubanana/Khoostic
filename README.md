@@ -1,4 +1,4 @@
-<img src="Assets/Logo.png" alt="Logo" width="60%">
+<img src="Assets/Logo.png" alt="Logo" width="80%">
 
 # Khoostic :musical_note: 
 
