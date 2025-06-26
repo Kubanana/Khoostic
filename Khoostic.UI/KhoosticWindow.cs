@@ -43,7 +43,7 @@ namespace Khoostic.UI
 
             KhoosticPlayer.InitPlayer();
             DiscordRPController.Init();
-            
+
             LoadSongs();
         }
 
@@ -73,7 +73,7 @@ namespace Khoostic.UI
             {
                 var button = new Button
                 {
-                    Content = Path.GetFileName(song),
+                    Content = Path.GetFileNameWithoutExtension(song),
                     Tag = song,
                     Margin = new Thickness(0, 5, 0, 5),
                     Padding = new Thickness(10),
