@@ -2,10 +2,13 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 
 using BiggyTools.Debugging;
+
+using Khoostic.Player;
 
 namespace Khoostic.UI
 {
@@ -38,6 +41,9 @@ namespace Khoostic.UI
 
             Content = root;
 
+            KhoosticPlayer.InitPlayer();
+            DiscordRPController.Init();
+            
             LoadSongs();
         }
 
@@ -75,7 +81,16 @@ namespace Khoostic.UI
                     Background = Brushes.LightGray
                 };
 
+                button.Click += PlaySong;
                 _songsPanel.Children.Add(button);
+            }
+        }
+
+        private void PlaySong(object? sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is string filePath)
+            {
+                KhoosticPlayer.Play(filePath);
             }
         }
     }
