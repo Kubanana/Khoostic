@@ -1,8 +1,6 @@
 ﻿using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Layout;
-using Avalonia.Media;
+using Avalonia.Themes.Fluent;
 
 using Khoostic.UI;
 
@@ -26,6 +24,13 @@ namespace Program
 
     public class App : Application
     {
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            Styles.Add(new FluentTheme());
+        }
+
         public override void OnFrameworkInitializationCompleted()
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
