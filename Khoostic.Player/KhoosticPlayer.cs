@@ -1,3 +1,5 @@
+using DiscordRPC;
+
 using LibVLCSharp.Shared;
 
 namespace Khoostic.Player
@@ -6,7 +8,7 @@ namespace Khoostic.Player
     {
         public static string[] AllowedExtentions = { ".flac", ".mp3", ".wav", ".m4a" };
 
-        public string? CurrentSong;
+        public string? CurrentSongName;
 
         public List<string> LoadedSongs;
 
@@ -25,13 +27,30 @@ namespace Khoostic.Player
             Core.Initialize();
             _libVLC = new LibVLC();
             MediaPlayer = new MediaPlayer(_libVLC);
+            DiscordRPController.Init();
 
             LoadSongs();
         }
 
-        public static void PlaySong(string song)
+        public void PlaySong(string song)
         {
+            var media = new Media(_libVLC, song, FromType.FromPath);
+            MediaPlayer?.Play(media);
 
+            CurrentSongName = Path.GetFileNameWithoutExtension(song);
+
+            DiscordRPController.UpdateSongPresence(Path.GetFileNameWithoutExtension(song), "Unknown Artist");
+        }
+
+        public void PlayRandomSong()
+        {
+            Random random = new Random();
+
+            int max = LoadedSongs.Count;
+            int randomIndex = random.Next(max);
+
+            string song = LoadedSongs[randomIndex];
+            PlaySong(song);
         }
 
         public bool IsShuffleEnabled => _shuffle;
@@ -55,10 +74,7 @@ namespace Khoostic.Player
                 .Where(song => AllowedExtentions.Contains(Path.GetExtension(song)))
                 .ToList();
 
-            foreach (var song in songs)
-            {
-                Console.WriteLine(song);
-            }
+            LoadedSongs = songs;
         }
 
         private string GetMusicFolderPath()

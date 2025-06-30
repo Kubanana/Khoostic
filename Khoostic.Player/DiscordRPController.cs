@@ -1,5 +1,3 @@
-using BiggyTools.Debugging;
-
 using DiscordRPC;
 
 namespace Khoostic.Player
