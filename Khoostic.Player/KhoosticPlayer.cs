@@ -1,11 +1,11 @@
-using BiggyTools.Debugging;
-
 using LibVLCSharp.Shared;
 
 namespace Khoostic.Player
 {
     public class KhoosticPlayer
     {
+        public static string[] AllowedExtentions = { ".flac", ".mp3", ".wav", ".m4a" };
+
         public string? CurrentSong;
 
         public List<string> LoadedSongs;
@@ -31,7 +31,7 @@ namespace Khoostic.Player
 
         public static void PlaySong(string song)
         {
-            
+
         }
 
         public bool IsShuffleEnabled => _shuffle;
@@ -50,7 +50,15 @@ namespace Khoostic.Player
         private void LoadSongs()
         {
             string musicFolderPath = GetMusicFolderPath();
-            Logger.Log(musicFolderPath);
+
+            var songs = Directory.EnumerateFiles(musicFolderPath, "*.*", SearchOption.AllDirectories)
+                .Where(song => AllowedExtentions.Contains(Path.GetExtension(song)))
+                .ToList();
+
+            foreach (var song in songs)
+            {
+                Console.WriteLine(song);
+            }
         }
 
         private string GetMusicFolderPath()
