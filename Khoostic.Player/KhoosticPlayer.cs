@@ -1,5 +1,3 @@
-using DiscordRPC;
-
 using LibVLCSharp.Shared;
 
 namespace Khoostic.Player
@@ -10,7 +8,7 @@ namespace Khoostic.Player
 
         public string? CurrentSongName;
 
-        public List<string> LoadedSongs;
+        public List<string>? LoadedSongs;
 
         private LibVLC? _libVLC;
         public MediaPlayer? MediaPlayer;
@@ -34,7 +32,7 @@ namespace Khoostic.Player
 
         public void PlaySong(string song)
         {
-            var media = new Media(_libVLC, song, FromType.FromPath);
+            var media = new Media(_libVLC!, song, FromType.FromPath);
             MediaPlayer?.Play(media);
 
             CurrentSongName = Path.GetFileNameWithoutExtension(song);
@@ -46,7 +44,7 @@ namespace Khoostic.Player
         {
             Random random = new Random();
 
-            int max = LoadedSongs.Count;
+            int max = LoadedSongs!.Count;
             int randomIndex = random.Next(max);
 
             string song = LoadedSongs[randomIndex];

@@ -1,4 +1,6 @@
-﻿using Khoostic;
+﻿using Avalonia;
+
+using Khoostic;
 
 namespace Program
 {
@@ -6,8 +8,14 @@ namespace Program
     {
         public static void Main(string[] args)
         {
-            App app = new App();
-            app.Run();
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        }
+
+        public static AppBuilder BuildAvaloniaApp()
+        {
+            return AppBuilder.Configure<App>()
+                .UsePlatformDetect()
+                .LogToTrace();
         }
     }
 }

@@ -1,43 +1,20 @@
-using Khoostic.Player;
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+
+using Khoostic.UI;
 
 namespace Khoostic
 {
-    public class App
-    {   
-        public App()
+    public class App : Application
+    {
+        public override void OnFrameworkInitializationCompleted()
         {
-
-        }
-
-        public void Run()
-        {
-            KhoosticPlayer player = new KhoosticPlayer();
-            player.InitPlayer();
-
-            while (true)
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                Console.Clear();
-                Console.WriteLine("Khoostic");
-                Console.WriteLine("");
-                Console.WriteLine("r - Plays random song.");
-                Console.WriteLine("exit - Exits the application.");
-                Console.WriteLine("");
-                Console.WriteLine($"Now playing: {player.CurrentSongName}");
-                Console.WriteLine("");
-                Console.Write("Enter command: ");
-
-                string? input = Console.ReadLine()?.ToLower();
-
-                if (input == "r")
-                {
-                    player.PlayRandomSong();
-                }
-
-                if (input == "exit")
-                {
-                    break;
-                }
+                desktop.MainWindow = new MainWindow();
             }
+
+            base.OnFrameworkInitializationCompleted();
         }
     }
 }
