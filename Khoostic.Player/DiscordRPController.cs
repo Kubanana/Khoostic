@@ -1,12 +1,10 @@
-using BiggyTools.Debugging;
-
 using DiscordRPC;
 
 namespace Khoostic.Player
 {
     public static class DiscordRPController
     {
-        private static DiscordRpcClient _client;
+        private static DiscordRpcClient? _client;
 
         public static void Init()
         {
@@ -16,7 +14,7 @@ namespace Khoostic.Player
 
         public static void UpdateSongPresence(string title, string artist)
         {
-            _client.SetPresence(new RichPresence()
+            _client?.SetPresence(new RichPresence()
             {
                 Details = $"Listening to {title}",
                 State = $"By {artist}",
@@ -32,12 +30,12 @@ namespace Khoostic.Player
 
         public static void ClearPresence()
         {
-            _client.ClearPresence();
+            _client?.ClearPresence();
         }
 
         public static void Shutdown()
         {
-            _client.Dispose();
+            _client?.Dispose();
         }
     }
 }
