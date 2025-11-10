@@ -1,3 +1,5 @@
+using Avalonia.Logging;
+
 using LibVLCSharp.Shared;
 
 namespace Khoostic.Player
@@ -35,9 +37,9 @@ namespace Khoostic.Player
             var media = new Media(_libVLC!, song, FromType.FromPath);
             MediaPlayer?.Play(media);
 
-            CurrentSongName = Path.GetFileNameWithoutExtension(song);
+            CurrentSongName = GetSongName(song);
 
-            DiscordRPController.UpdateSongPresence(Path.GetFileNameWithoutExtension(song), "Unknown Artist");
+            DiscordRPController.UpdateSongPresence(GetSongName(song), GetArtistName(song));
         }
 
         public void PlayRandomSong()
@@ -49,6 +51,39 @@ namespace Khoostic.Player
 
             string song = LoadedSongs[randomIndex];
             PlaySong(song);
+        }
+
+        public string GetSongName(string songPath)
+        {
+            var file = TagLib.File.Create(songPath);
+
+            if (file.Tag.Title != null)
+            {
+                return file.Tag.Title;
+            }
+
+            return Path.GetFileNameWithoutExtension(songPath);
+        }
+
+        public string GetArtistName(string songPath)
+        {
+            var file = TagLib.File.Create(songPath);
+
+            return file.Tag.FirstPerformer;
+        }
+
+        public byte[]? GetCoverArt(string songPath)
+        {
+            var file = TagLib.File.Create(songPath);
+
+            var pictures = file.Tag.Pictures;
+
+            if (pictures.Length > 0)
+            {
+                return pictures[0].Data.Data;
+            }
+
+            return null;
         }
 
         public bool IsShuffleEnabled => _shuffle;

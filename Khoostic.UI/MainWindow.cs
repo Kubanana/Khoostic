@@ -53,7 +53,7 @@ namespace Khoostic.UI
             if (KhoosticPlayer.LoadedSongs == null) return;
             foreach (var song in KhoosticPlayer.LoadedSongs)
             {
-                var songButton = CreateSongButton(Path.GetFileNameWithoutExtension(song));
+                var songButton = CreateSongButton(KhoosticPlayer.GetSongName(song));
                 songButton.Click += (_, _) => KhoosticPlayer.PlaySong(song);
                 songButton.Click += (_, _) => mainPanelText.Text = $"Now playing: {KhoosticPlayer.CurrentSongName}";
 
@@ -72,7 +72,8 @@ namespace Khoostic.UI
             var button = new Button();
 
             button.Content = content;
-            button.Background = Brushes.White;
+            button.Background = Brushes.Gray;
+            button.Foreground = Brushes.White;
             button.Width = 200;
             button.Height = 50;
 
