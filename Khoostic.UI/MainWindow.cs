@@ -1,8 +1,10 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 
 using Khoostic.Player;
 
@@ -47,6 +49,17 @@ namespace Khoostic.UI
                 Foreground = new SolidColorBrush(Colors.White)
             };
 
+            var mainPanelCoverArt = new Image
+            {
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Width = 500,
+                Height = 500,
+                Stretch = Stretch.UniformToFill,
+                Margin = new Thickness(4)
+            };
+
+            mainPanel.Children.Add(mainPanelCoverArt);
             mainPanel.Children.Add(mainPanelText);
 
 
@@ -56,6 +69,7 @@ namespace Khoostic.UI
                 var songButton = CreateSongButton(KhoosticPlayer.GetSongName(song));
                 songButton.Click += (_, _) => KhoosticPlayer.PlaySong(song);
                 songButton.Click += (_, _) => mainPanelText.Text = $"Now playing: {KhoosticPlayer.CurrentSongName}";
+                songButton.Click += (_, _) => mainPanelCoverArt.Source = LoadCoverArt(song);
 
                 songListPanel.Children.Add(songButton);
             }
@@ -83,6 +97,15 @@ namespace Khoostic.UI
         private void OnButtonClick(object? sender, RoutedEventArgs e)
         {
             Console.WriteLine("Pressed Button");
+        }
+
+        private Bitmap? LoadCoverArt(string filePath)
+        {
+            var bytes = KhoosticPlayer.GetCoverArt(filePath);
+            if (bytes == null) return null;
+
+            var ms = new MemoryStream(bytes);
+            return new Bitmap(ms);
         }
     }
 }
