@@ -3,6 +3,8 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 
+using Khoostic.Player;
+
 namespace Khoostic.UI
 {
     public class MainWindow : Window
@@ -13,6 +15,9 @@ namespace Khoostic.UI
             Width = 800;
             Height = 600;
 
+            KhoosticPlayer khoosticPlayer = new KhoosticPlayer();
+            khoosticPlayer.InitPlayer();
+
             Background = Brushes.Black;
 
             var stackPanel = new StackPanel
@@ -22,19 +27,32 @@ namespace Khoostic.UI
                 VerticalAlignment = VerticalAlignment.Center
             };
 
-            var button = new Button
+            var PlayButton = CreateButton("Play");
+            PlayButton.Click += OnButtonClick;
+
+            stackPanel.Children.Add(PlayButton);
+
+            if (khoosticPlayer.LoadedSongs == null) return;
+            foreach (var song in khoosticPlayer.LoadedSongs)
             {
-                Content = "Play",
-                Background = Brushes.White,
-                Width = 200,
-                Height = 100
-            };
+                var songButton = CreateButton(song);
 
-            button.Click += OnButtonClick;
-
-            stackPanel.Children.Add(button);
+                stackPanel.Children.Add(songButton);
+            }
 
             Content = stackPanel;
+        }
+
+        private Button CreateButton(string content)
+        {
+            var button = new Button();
+
+            button.Content = content;
+            button.Background = Brushes.White;
+            button.Width = 200;
+            button.Height = 100;
+
+            return button;
         }
 
         private void OnButtonClick(object? sender, RoutedEventArgs e)
