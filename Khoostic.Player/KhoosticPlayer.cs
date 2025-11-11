@@ -1,5 +1,3 @@
-using Avalonia.Logging;
-
 using LibVLCSharp.Shared;
 
 namespace Khoostic.Player

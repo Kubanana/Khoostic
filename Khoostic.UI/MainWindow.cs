@@ -59,10 +59,6 @@ namespace Khoostic.UI
                 Margin = new Thickness(4)
             };
 
-            mainPanel.Children.Add(mainPanelCoverArt);
-            mainPanel.Children.Add(mainPanelText);
-
-
             if (KhoosticPlayer.LoadedSongs == null) return;
             foreach (var song in KhoosticPlayer.LoadedSongs)
             {
@@ -74,9 +70,38 @@ namespace Khoostic.UI
                 songListPanel.Children.Add(songButton);
             }
 
+            mainPanel.Children.Add(mainPanelCoverArt);
+            mainPanel.Children.Add(mainPanelText);
+
+            var bottomPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Background = new SolidColorBrush(Colors.Gray),
+                Height = 60,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Spacing = 10
+            };
+
+            var volumeSlider = new Slider
+            {
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+                Minimum = 0,
+                Maximum = 100,
+                Value = 50,
+                Width = 100
+            };
+
+            bottomPanel.Children.Add(volumeSlider);
+
             grid.Children.Add(scrollViewer);
             grid.Children.Add(mainPanel);
             Grid.SetColumn(mainPanel, 1);
+            Grid.SetRow(mainPanel, 0);
+
+            grid.Children.Add(bottomPanel);
+            Grid.SetColumn(bottomPanel, 1);
+            Grid.SetRow(bottomPanel, 1);
 
             Content = grid;
         }
