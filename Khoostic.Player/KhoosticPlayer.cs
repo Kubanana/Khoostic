@@ -4,7 +4,7 @@ namespace Khoostic.Player
 {
     public class KhoosticPlayer
     {
-        public static string[] AllowedExtentions = { ".flac", ".mp3", ".wav", ".m4a" };
+        public static string[] AllowedExtentions = { ".flac", ".mp3", ".wav", ".m4a", ".opus" };
 
         public string? CurrentSongName;
 
