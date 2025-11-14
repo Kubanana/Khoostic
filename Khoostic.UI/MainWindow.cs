@@ -89,7 +89,8 @@ namespace Khoostic.UI
                 Minimum = 0,
                 Maximum = 100,
                 Value = 50,
-                Width = 100
+                Width = 100,
+                Height = 50
             };
 
             bottomPanel.Children.Add(volumeSlider);

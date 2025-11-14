@@ -67,7 +67,12 @@ namespace Khoostic.Player
         {
             var file = TagLib.File.Create(songPath);
 
-            return file.Tag.FirstPerformer;
+            if (file.Tag.FirstAlbumArtist != null)
+            {
+                return file.Tag.FirstPerformer;
+            }
+
+            return "Unknown Artist";
         }
 
         public byte[]? GetCoverArt(string songPath)
