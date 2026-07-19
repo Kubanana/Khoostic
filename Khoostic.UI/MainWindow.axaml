@@ -1,0 +1,188 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:Khoostic.UI"
+    x:Class="Khoostic.UI.MainWindow"
+    x:DataType="vm:MainWindow"
+    Title="Khoostic"
+    Width="800"
+    Height="600"
+    Background="Black">
+
+    <Window.Styles>
+
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+        </Style>
+
+
+        <Style Selector="Button">
+            <Setter Property="Background" Value="#181818"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="16,10"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="15"/>
+        </Style>
+
+
+        <Style Selector="Button:pointerover">
+            <Setter Property="Background" Value="#303030"/>
+            <Setter Property="Opacity" Value="0.9"/>
+        </Style>
+
+
+        <Style Selector="Button.songButton">
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Height" Value="55"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+
+
+        <Style Selector="Slider">
+            <Setter Property="Height" Value="20"/>
+        </Style>
+
+
+    </Window.Styles>
+
+
+    <Grid RowDefinitions="*,90"
+          ColumnDefinitions="300,*">
+
+
+        <Border Grid.Row="0"
+                Grid.Column="0"
+                Background="#0B0B0B"
+                Padding="15">
+        
+            <ScrollViewer>
+                
+                <ItemsControl ItemsSource="{Binding Songs}">
+
+                    <ItemsControl.ItemTemplate>
+
+                        <DataTemplate>
+
+                            <Button Classes="songButton"
+                                    Click="Song_Click">
+
+                                <StackPanel>
+
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="15"/>
+
+                                    <TextBlock Text="{Binding Artist}"
+                                               FontSize="12"
+                                               Opacity="0.5"/>
+
+                                </StackPanel>
+
+                            </Button>
+
+                        </DataTemplate>
+
+                    </ItemsControl.ItemTemplate>
+
+                </ItemsControl>
+
+            </ScrollViewer>
+
+        </Border>
+
+
+
+        <StackPanel Grid.Row="0"
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Spacing="20">
+
+            <Border Width="350"
+                    Height="350"
+                    CornerRadius="25"
+                    Background="#111111">
+
+                <Image Source="{Binding CurrentArt}"
+                       Stretch="UniformToFill"/>
+
+            </Border>
+
+
+
+            <TextBlock Text="{Binding CurrentTitle}"
+                       FontSize="28"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"/>
+
+
+            <TextBlock Text="{Binding CurrentArtist}"
+                       FontSize="16"
+                       Opacity="0.6"
+                       HorizontalAlignment="Center"/>
+
+
+        </StackPanel>
+
+
+
+
+        <Grid Grid.Row="1"
+              Grid.ColumnSpan="2"
+              Background="#080808"
+              ColumnDefinitions="Auto,*,Auto">
+
+
+            <StackPanel Orientation="Horizontal"
+                        Spacing="12">
+
+
+                <Button Content="▶"
+                        Width="55"
+                        Height="45"
+                        Click="Play_Click"/>
+
+
+                <Button Content="■"
+                        Width="55"
+                        Height="45"
+                        Click="Stop_Click"/>
+
+
+            </StackPanel>
+
+
+
+
+            <TextBlock Grid.Column="1"/>
+
+
+
+
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        Spacing="15"
+                        VerticalAlignment="Center">
+
+
+                <TextBlock Text="VOL"
+                           Opacity="0.6"
+                           VerticalAlignment="Center"/>
+
+
+                <Slider Width="160"
+                        Minimum="0"
+                        Maximum="100"
+                        Value="{Binding Volume}"/>
+
+
+            </StackPanel>
+
+
+        </Grid>
+
+
+    </Grid>
+
+
+</Window>

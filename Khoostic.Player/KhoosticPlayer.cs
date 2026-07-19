@@ -1,14 +1,33 @@
+using Avalonia.Media.Imaging;
+
 using LibVLCSharp.Shared;
 
 namespace Khoostic.Player
 {
+    public class Song
+    {
+        public string? Name { get; set; }
+        public string? Artist { get; set; }
+        public string? FilePath { get; set; }
+        public Bitmap? CoverArt { get; set; }
+
+        public Song(string name, string artist)
+        {
+            Name = name;
+            Artist = artist;
+        }
+    }
+
     public class KhoosticPlayer
     {
         public static string[] AllowedExtentions = { ".flac", ".mp3", ".wav", ".m4a", ".opus" };
+        
+        public string? CurrentTitle;
+        public string? CurrentArtist;
+        public Bitmap? CurrentArt;
 
-        public string? CurrentSongName;
-
-        public List<string>? LoadedSongs;
+        public List<Song>? Songs = new List<Song>();
+        public double Volume;
 
         private LibVLC? _libVLC;
         public MediaPlayer? MediaPlayer;
@@ -30,28 +49,29 @@ namespace Khoostic.Player
             LoadSongs();
         }
 
-        public void PlaySong(string song)
+        public void PlaySong(Song song)
         {
-            var media = new Media(_libVLC!, song, FromType.FromPath);
+            var media = new Media(_libVLC!, song.FilePath!, FromType.FromPath);
             MediaPlayer?.Play(media);
 
-            CurrentSongName = GetSongName(song);
+            CurrentTitle = song.Name;
+            CurrentArtist = song.Artist;
+            CurrentArt = song.CoverArt;
 
-            DiscordRPController.UpdateSongPresence(GetSongName(song), GetArtistName(song));
+            DiscordRPController.UpdateSongPresence(song.Name!, song.Artist!);
         }
 
         public void PlayRandomSong()
         {
             Random random = new Random();
 
-            int max = LoadedSongs!.Count;
+            int max = Songs!.Count;
             int randomIndex = random.Next(max);
 
-            string song = LoadedSongs[randomIndex];
-            PlaySong(song);
+            string song = Songs[randomIndex].FilePath!;
         }
 
-        public string GetSongName(string songPath)
+        public string GetSongTitle(string songPath)
         {
             var file = TagLib.File.Create(songPath);
 
@@ -63,7 +83,7 @@ namespace Khoostic.Player
             return Path.GetFileNameWithoutExtension(songPath);
         }
 
-        public string GetArtistName(string songPath)
+        public string GetArtist(string songPath)
         {
             var file = TagLib.File.Create(songPath);
 
@@ -110,7 +130,26 @@ namespace Khoostic.Player
                 .Where(song => AllowedExtentions.Contains(Path.GetExtension(song)))
                 .ToList();
 
-            LoadedSongs = songs;
+            foreach (var song in songs)
+            {
+                Song loadedSong = new Song("bob", "bob");
+
+                loadedSong.Name = GetSongTitle(song);
+                loadedSong.Artist = GetArtist(song);
+                loadedSong.FilePath = song;
+                loadedSong.CoverArt = LoadCoverArt(song);
+
+                Songs!.Add(loadedSong);
+            }
+        }
+
+        private Bitmap? LoadCoverArt(string filePath)
+        {
+            var bytes = GetCoverArt(filePath);
+            if (bytes == null) return null;
+
+            var ms = new MemoryStream(bytes);
+            return new Bitmap(ms);
         }
 
         private string GetMusicFolderPath()

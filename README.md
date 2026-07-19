@@ -8,3 +8,5 @@ Khoostic is a **GPU-Accelerated, Cross-Platform** Music Player written in **Pure
 > Khoostic is gonna be a Buggy mess it's in super early early early stages of development.
 
 ## Featrues
+
+Absolutely none
