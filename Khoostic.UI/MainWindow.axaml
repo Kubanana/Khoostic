@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:Khoostic.UI"
     x:Class="Khoostic.UI.MainWindow"
-    x:DataType="vm:MainWindow"
+    x:DataType="vm:MainViewModel"
     Title="Khoostic"
     Width="800"
     Height="600"
@@ -58,14 +58,15 @@
         
             <ScrollViewer>
                 
-                <ItemsControl ItemsSource="{Binding Songs}">
+                <ItemsControl x:Name="SongList" ItemsSource="{Binding Songs}">
 
                     <ItemsControl.ItemTemplate>
 
                         <DataTemplate>
 
                             <Button Classes="songButton"
-                                    Click="Song_Click">
+                                    Command="{Binding #SongList.DataContext.SongClickCommand}"
+                                    CommandParameter="{Binding}">
 
                                 <StackPanel>
 
@@ -140,13 +141,15 @@
                 <Button Content="▶"
                         Width="55"
                         Height="45"
-                        Click="Play_Click"/>
+                        Command="{Binding PlayClickCommand}"
+                                    CommandParameter="{Binding}"/>
 
 
                 <Button Content="■"
                         Width="55"
                         Height="45"
-                        Click="Stop_Click"/>
+                        Command="{Binding StopClickCommand}"
+                                    CommandParameter="{Binding}"/>
 
 
             </StackPanel>

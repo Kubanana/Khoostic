@@ -22,12 +22,12 @@ namespace Khoostic.Player
     {
         public static string[] AllowedExtentions = { ".flac", ".mp3", ".wav", ".m4a", ".opus" };
         
-        public string? CurrentTitle;
-        public string? CurrentArtist;
-        public Bitmap? CurrentArt;
+        public static string? CurrentTitle;
+        public static string? CurrentArtist;
+        public static Bitmap? CurrentArt;
 
-        public List<Song>? Songs = new List<Song>();
-        public double Volume;
+        public static List<Song>? Songs = new List<Song>();
+        public static double Volume;
 
         private LibVLC? _libVLC;
         public MediaPlayer? MediaPlayer;
